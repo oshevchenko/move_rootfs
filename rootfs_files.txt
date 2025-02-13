@@ -1,0 +1,12 @@
+drwxr-xr-x 0/0               0 2018-03-09 14:34 ./var/lib/
+drwxr-xr-x 0/0               0 2018-03-09 14:34 ./var/lib/arpd/
+drwxr-xr-x 0/0               0 2018-03-09 14:34 ./var/lib/chrony/
+drwxr-xr-x 999/999           0 2018-03-09 14:34 ./var/lib/dbus/
+drwxr-xr-x 0/0               0 2018-03-09 14:34 ./var/lib/misc/
+drwxr-xr-x 28/28             0 2018-03-09 14:34 ./var/lib/postgresql/
+-rw-r--r-- 28/28            90 2018-03-09 14:34 ./var/lib/postgresql/.profile
+drwx------ 28/28             0 2018-03-09 14:34 ./var/lib/postgresql/backups/
+drwx------ 28/28             0 2018-03-09 14:34 ./var/lib/postgresql/data/
+drwx--x--x 0/0               0 2018-03-09 14:34 ./var/lib/sudo/
+drwx------ 0/0               0 2018-03-09 14:34 ./var/lib/sudo/lectured/
+drwxr-xr-x 0/0               0 2018-03-09 14:34 ./var/lib/systemd/
