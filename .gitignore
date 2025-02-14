@@ -171,4 +171,5 @@ cython_debug/
 .pypirc
 *.tar.gz
 *.ext4
+e2cp_to_ext4.sh
 
