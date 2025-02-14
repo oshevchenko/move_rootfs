@@ -28,6 +28,9 @@ veryclean:
 	rm -rf dist
 	rm -rf $(VENV_PATH)
 
+run:
+	python3 ./move_rootfs.py
+
 test:
 	$(VENV_BIN_PATH)/python3 -m unittest discover -s tests
 

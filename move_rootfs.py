@@ -28,7 +28,7 @@ drwxr-xr-x 28/28             0 2018-03-09 14:34 ./var/lib/postgresql/
 -rw-r--r-- 28/28            90 2018-03-09 14:34 ./var/lib/postgresql/.profile
 
 """
-def parse_file_for_mode_uid_gid(line, source_dir_parent):
+def parse_file_for_mode_uid_gid(line, img_path):
     cmd = None
     line = re.sub(r'[ \t]+', ' ', line)
     pattern = r"([a-zA-Z\-]+) (\d+)\/(\d+) \d+ \d{4}\-\d{2}\-\d{2} \d{2}:\d{2} (.+)"
@@ -48,15 +48,13 @@ def parse_file_for_mode_uid_gid(line, source_dir_parent):
         print(f"UID: {uid}")
         print(f"GID: {gid}")
         print(f"File Name: {file_name}")
+        dst_file_name = re.sub("^./", "/", file_name)
         if type=='d':
             # This is a directory
-            dst_file_name = re.sub("^./", "/", file_name)
-            cmd = f"e2mkdir -v -P {mode} -O {uid} -G {gid} ./img.ext4:{dst_file_name}\n"
+            cmd = f"e2mkdir -v -P {mode} -O {uid} -G {gid} {img_path}:{dst_file_name}\n"
         else:
             # This is a file
-            src_file_name = re.sub("^"+source_dir_parent, ".", file_name)
-            dst_file_name = re.sub("^./", "/", file_name)
-            cmd = f"e2cp -v -P {mode} -O {uid} -G {gid} {src_file_name} -d ./img.ext4:{dst_file_name}\n"
+            cmd = f"e2cp -v -P {mode} -O {uid} -G {gid} {file_name} -d {img_path}:{dst_file_name}\n"
     else:
         print("No match found.")
     return cmd
@@ -72,7 +70,7 @@ print(f"Mode: {mode}")
 """
 Create a list of files
 
-tar --strip-components=2 -tvf ./rootfs.tar.gz ./var/lib | tee rootfs_files.txt
+tar -tvf ./rootfs.tar.gz ./var/lib | tee rootfs_files.txt
 drwxr-xr-x 0/0               0 2018-03-09 14:34 ./var/lib/
 drwxr-xr-x 0/0               0 2018-03-09 14:34 ./var/lib/arpd/
 drwxr-xr-x 0/0               0 2018-03-09 14:34 ./var/lib/chrony/
@@ -82,7 +80,7 @@ drwxr-xr-x 28/28             0 2018-03-09 14:34 ./var/lib/postgresql/
 -rw-r--r-- 28/28            90 2018-03-09 14:34 ./var/lib/postgresql/.profile
 
 Extract files:
-tar --strip-components=2 -xzvf ./rootfs.tar.gz ./var/lib
+tar -xzvf ./rootfs.tar.gz ./var/lib
 
 
 """
@@ -94,24 +92,25 @@ source_dir="./var/lib"
 
 
 # Get the directory part before the last component
-source_dir_parent = os.path.dirname(source_dir)
+# source_dir_parent = os.path.dirname(source_dir)
 
 
-print("Parent directory:", source_dir_parent)  # Output: ./var
+# print("Parent directory:", source_dir_parent)  # Output: ./var
 
 
 script_file_path = 'e2cp_to_ext4.sh'
 rootfs_file_path = 'rootfs_files.txt'  # Replace with your file path
+img_path="./img.ext4"
 list_of_lines = ["#!/bin/sh\n",
-                "rm -rf ./img.ext4\n",
-                "dd if=/dev/zero of=./img.ext4 bs=1M count=100\n",
-                "mkfs.ext4 ./img.ext4\n"
+                f"rm -rf {img_path}\n",
+                f"dd if=/dev/zero of={img_path} bs=1M count=100\n",
+                f"mkfs.ext4 {img_path}\n"
                 ]
 
 with open(rootfs_file_path, 'r') as file:
     for line in file:
         # Process each line here
-        cmd = parse_file_for_mode_uid_gid(line, source_dir_parent)
+        cmd = parse_file_for_mode_uid_gid(line, img_path)
         if cmd:
             list_of_lines.append(cmd)
 with open(script_file_path, 'w') as file:
